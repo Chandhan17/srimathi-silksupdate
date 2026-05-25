@@ -92,6 +92,24 @@ function getImageContentType(filePath, fallback = 'application/octet-stream') {
   return contentTypeByExtension[extension] || fallback
 }
 
+function getMimeTypeFromPath(path = '') {
+  const lower = String(path || '').toLowerCase()
+
+  if (lower.endsWith('.png')) {
+    return 'image/png'
+  }
+
+  if (lower.endsWith('.webp')) {
+    return 'image/webp'
+  }
+
+  if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) {
+    return 'image/jpeg'
+  }
+
+  return 'image/jpeg'
+}
+
 function runMiddleware(req, res, middleware) {
   return new Promise((resolve, reject) => {
     middleware(req, res, (error) => {
@@ -457,12 +475,15 @@ export function createTelegramImageProxyHandler({ telegramToken }) {
         // ignore
       }
 
-      const contentType =
-        imageResponse.headers['content-type'] ||
-        getImageContentType(reference.type === 'file_path' ? reference.value : filePath, 'image/jpeg')
+      const contentType = imageResponse.headers['content-type']
+      const safeContentType =
+        contentType && contentType !== 'application/octet-stream'
+          ? contentType
+          : getMimeTypeFromPath(filePath)
 
       res.statusCode = 200
-      res.setHeader('Content-Type', contentType)
+      res.setHeader('Content-Type', safeContentType || 'image/jpeg')
+      res.setHeader('Content-Disposition', 'inline')
       res.setHeader('Cache-Control', 'public, max-age=31536000, immutable')
       res.setHeader('X-Content-Type-Options', 'nosniff')
       res.setHeader('Access-Control-Allow-Origin', '*')

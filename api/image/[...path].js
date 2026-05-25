@@ -11,10 +11,6 @@ export default async function handler(req, res) {
     const pathSegments = req.query && req.query.path
     const filePath = Array.isArray(pathSegments) ? pathSegments.join('/') : pathSegments
 
-    console.log('REQ URL:', req.url)
-    console.log('QUERY:', req.query)
-    console.log('FILE PATH:', filePath)
-
     if (!req.query) req.query = {}
 
     if (!req.query.fileId && typeof filePath !== 'undefined') {
