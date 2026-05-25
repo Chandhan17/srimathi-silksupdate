@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand-gold-rgb: 201 161 74;
+  --brand-maroon-rgb: 90 15 28;
+  --brand-cream-rgb: 248 241 229;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: 'Lora', serif;
+  background-color: var(--brand-cream);
+  color: var(--brand-maroon);
+}
+
+@layer components {
+  .btn-gold {
+    @apply rounded-lg bg-brand-gold px-4 py-2 text-sm font-semibold text-brand-maroon transition duration-300 hover:scale-[1.02] hover:bg-brand-maroon hover:text-brand-cream;
+  }
+
+  .btn-outline {
+    @apply rounded-lg border border-brand-gold/70 px-4 py-2 text-sm font-medium text-brand-maroon transition hover:bg-brand-maroon hover:text-brand-cream;
+  }
+
+  .input-field {
+    @apply w-full rounded-lg border border-brand-maroon/25 bg-white px-3 py-2 text-sm text-brand-maroon outline-none transition focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20;
+  }
+
+  .section-kicker {
+    @apply text-xs uppercase tracking-[0.28em] text-brand-maroon/70;
+  }
+
+  .section-title {
+    @apply mt-1 font-display text-4xl text-brand-maroon md:text-5xl;
+  }
+
+  .nav-link {
+    @apply transition hover:text-brand-gold;
+  }
+}
