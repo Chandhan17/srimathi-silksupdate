@@ -9,13 +9,17 @@ export default async function handler(req, res) {
   // Supports: /api/image/<fileId>  and /api/image/photos/file_123.webp
   try {
     const pathSegments = req.query && req.query.path
+    const filePath = Array.isArray(pathSegments) ? pathSegments.join('/') : pathSegments
+
+    console.log('REQ URL:', req.url)
+    console.log('QUERY:', req.query)
+    console.log('FILE PATH:', filePath)
 
     if (!req.query) req.query = {}
 
-    if (!req.query.fileId && typeof pathSegments !== 'undefined') {
-      const fileId = Array.isArray(pathSegments) ? pathSegments.join('/') : pathSegments
+    if (!req.query.fileId && typeof filePath !== 'undefined') {
       // strip leading slashes if any
-      req.query.fileId = String(fileId || '').replace(/^\/+/, '')
+      req.query.fileId = String(filePath || '').replace(/^\/+/, '')
     }
   } catch (e) {
     // If normalization fails, continue and let base handler return a safe error
