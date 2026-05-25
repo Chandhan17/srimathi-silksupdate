@@ -1,3 +1,16 @@
+function getApiBaseUrl() {
+  const configuredBase = import.meta.env.VITE_API_BASE_URL?.trim()
+  if (configuredBase) {
+    return configuredBase.replace(/\/$/, '')
+  }
+
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return window.location.origin
+  }
+
+  return ''
+}
+
 function isTelegramDirectUrl(value) {
   return typeof value === 'string' && /^https:\/\/api\.telegram\.org\/file\/bot[^/]+\/.+$/i.test(value)
 }
@@ -41,7 +54,9 @@ function extractTelegramFilePath(value) {
 
 export function getTelegramProxyUrl(fileId) {
   if (!fileId) return ''
-  return `/api/image/${encodeURIComponent(fileId)}`
+  const baseUrl = getApiBaseUrl()
+  const proxyPath = `/api/image/${encodeURIComponent(fileId)}`
+  return baseUrl ? `${baseUrl}${proxyPath}` : proxyPath
 }
 
 function normalizeTelegramUrl(value) {

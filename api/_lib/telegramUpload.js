@@ -38,7 +38,15 @@ function isDevelopmentEnv() {
 }
 
 function buildTelegramProxyUrl(fileId) {
-  return fileId ? `/api/image/${encodeURIComponent(fileId)}` : ''
+  if (!fileId) return ''
+
+  const configuredBase = String(process.env.VERCEL_URL || process.env.VITE_API_BASE_URL || '')
+    .trim()
+    .replace(/^https?:\/\//, '')
+    .replace(/\/$/, '')
+
+  const proxyPath = `/api/image/${encodeURIComponent(fileId)}`
+  return configuredBase ? `https://${configuredBase}${proxyPath}` : proxyPath
 }
 
 function resolveTelegramReference(fileRef) {
@@ -286,8 +294,10 @@ async function getTelegramFileMeta({ telegramToken, fileId }) {
 
   const filePath = telegramResponse.data.result.file_path
 
-  console.log('Telegram getFile response:', telegramResponse.data)
-  console.log('Resolved filePath:', filePath)
+  if (isDevelopmentEnv()) {
+    console.log('Telegram fetch response status:', telegramResponse.status)
+    console.log('Resolved filePath:', filePath)
+  }
 
   return {
     file_path: filePath,
@@ -309,8 +319,9 @@ async function fetchTelegramFileStream({ telegramToken, decodedFileId }) {
       : (await getTelegramFileMeta({ telegramToken, fileId: reference.value })).file_path
 
   const telegramFileUrl = `https://api.telegram.org/file/bot${telegramToken}/${filePath}`
-  // Avoid logging raw Telegram file URLs because they contain the bot token.
-  console.log('Telegram download URL resolved (redacted)')
+  if (isDevelopmentEnv()) {
+    console.log('Telegram download URL resolved (redacted)')
+  }
 
   const imageResponse = await axios.get(telegramFileUrl, {
     responseType: 'stream',
@@ -326,7 +337,7 @@ async function fetchTelegramFileStream({ telegramToken, decodedFileId }) {
 
 function getQueryFileId(req) {
   const raw = req?.query?.fileId
-  const first = Array.isArray(raw) ? raw[0] : raw
+  const first = Array.isArray(raw) ? raw.join('/') : raw
 
   if (first) {
     try {
@@ -411,7 +422,9 @@ export function createTelegramImageProxyHandler({ telegramToken }) {
 
     try {
       const decodedFileId = getQueryFileId(req)
-      console.log('Incoming fileId:', decodedFileId)
+      if (isDevelopmentEnv()) {
+        console.log('Incoming image proxy fileId:', decodedFileId)
+      }
 
       if (!decodedFileId) {
         return sendError(res, 400, 'Image file ID is required.')
@@ -426,8 +439,10 @@ export function createTelegramImageProxyHandler({ telegramToken }) {
         return sendJson(res, 500, { error: 'No image stream returned' })
       }
 
-      console.log('Resolved filePath:', filePath)
-      console.log('Streaming image now...')
+      if (isDevelopmentEnv()) {
+        console.log('Resolved proxy filePath:', filePath)
+        console.log('Streaming image now...')
+      }
 
       const contentType =
         imageResponse.headers['content-type'] ||
@@ -437,6 +452,7 @@ export function createTelegramImageProxyHandler({ telegramToken }) {
       res.setHeader('Content-Type', contentType)
       res.setHeader('Cache-Control', 'public, max-age=31536000, immutable')
       res.setHeader('X-Content-Type-Options', 'nosniff')
+      res.setHeader('Access-Control-Allow-Origin', '*')
 
       const contentLength = imageResponse.headers['content-length']
       if (contentLength) {
@@ -450,7 +466,9 @@ export function createTelegramImageProxyHandler({ telegramToken }) {
       })
 
       imageResponse.data.on('end', () => {
-        console.log('Telegram image stream completed')
+        if (isDevelopmentEnv()) {
+          console.log('Telegram image stream completed')
+        }
       })
 
       imageResponse.data.on('error', (streamError) => {

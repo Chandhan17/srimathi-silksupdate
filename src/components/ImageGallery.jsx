@@ -2,11 +2,12 @@ import { lazy, Suspense, useState } from 'react'
 import { getImageUrl } from '../utils/imageHelpers'
 
 const ImageZoom = lazy(() => import('./ImageZoom'))
+const FALLBACK_IMAGE = 'https://placehold.co/800x1000/F8F1E5/5A0F1C?text=Saree'
 
 export default function ImageGallery({ images = [] }) {
   const [activeIndex, setActiveIndex] = useState(0)
   const activeImage =
-    getImageUrl(images[activeIndex]) || 'https://placehold.co/800x1000/F8F1E5/5A0F1C?text=Saree'
+    getImageUrl(images[activeIndex]) || FALLBACK_IMAGE
   const galleryImages = images.length ? images : [activeImage]
 
   return (
@@ -29,7 +30,16 @@ export default function ImageGallery({ images = [] }) {
                 activeIndex === index ? 'border-brand-gold' : 'border-brand-maroon/20'
               }`}
             >
-              <img src={src} alt={`Thumbnail ${index + 1}`} className="h-24 w-full object-cover" loading="lazy" />
+              <img
+                src={src}
+                alt={`Thumbnail ${index + 1}`}
+                className="h-24 w-full object-cover"
+                loading="lazy"
+                onError={(event) => {
+                  event.currentTarget.onerror = null
+                  event.currentTarget.src = FALLBACK_IMAGE
+                }}
+              />
             </button>
           )
         })}

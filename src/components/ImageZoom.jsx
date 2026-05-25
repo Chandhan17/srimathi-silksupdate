@@ -4,6 +4,7 @@ import { Search, RotateCcw } from 'lucide-react'
 const TOGGLE_SCALE = 2.2
 const MIN_SCALE = 1
 const MAX_SCALE = 3
+const FALLBACK_IMAGE = 'https://placehold.co/800x1000/F8F1E5/5A0F1C?text=Saree'
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value))
@@ -275,6 +276,10 @@ export default function ImageZoom({ src, alt = 'Product image' }) {
             willChange: 'transform',
           }}
           loading="lazy"
+          onError={(event) => {
+            event.currentTarget.onerror = null
+            event.currentTarget.src = FALLBACK_IMAGE
+          }}
         />
 
         <div className="pointer-events-none absolute inset-0 bg-black/0 transition-colors duration-200" />

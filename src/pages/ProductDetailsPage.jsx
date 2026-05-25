@@ -7,6 +7,7 @@ import { formatINR } from '../utils/formatters'
 import { getImageUrl } from '../utils/imageHelpers'
 
 export default function ProductDetailsPage() {
+	const fallbackSizeChart = 'https://placehold.co/800x400/F8F1E5/5A0F1C?text=Size+Chart'
 	const { id } = useParams()
 	const [product, setProduct] = useState(null)
 	const [loading, setLoading] = useState(true)
@@ -81,6 +82,10 @@ export default function ProductDetailsPage() {
 						alt="Size chart"
 						className="max-h-64 rounded-xl border border-brand-gold/20 object-contain"
 						loading="lazy"
+							onError={(event) => {
+								event.currentTarget.onerror = null
+								event.currentTarget.src = fallbackSizeChart
+							}}
 					/>
 				)}
 

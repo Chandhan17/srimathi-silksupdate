@@ -2,10 +2,12 @@ import axios from 'axios'
 import { getIdToken } from './authService'
 
 const uploadEndpoint = import.meta.env.VITE_IMAGE_UPLOAD_ENDPOINT || '/api/upload-image'
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim()?.replace(/\/$/, '') || (typeof window !== 'undefined' ? window.location.origin : '')
 
 function buildProxyUrl(fileRef) {
   if (!fileRef) return ''
-  return `/api/image/${encodeURIComponent(fileRef)}`
+  const proxyPath = `/api/image/${encodeURIComponent(fileRef)}`
+  return apiBaseUrl ? `${apiBaseUrl}${proxyPath}` : proxyPath
 }
 
 function buildFormData(file) {
