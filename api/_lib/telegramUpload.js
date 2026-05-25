@@ -484,7 +484,6 @@ export function createTelegramImageProxyHandler({ telegramToken }) {
       res.statusCode = 200
       res.removeHeader('Content-Disposition')
       res.setHeader('Content-Type', safeContentType || 'image/jpeg')
-      res.setHeader('Content-Disposition', 'inline')
       res.setHeader('Cache-Control', 'public, max-age=31536000, immutable')
       res.setHeader('X-Content-Type-Options', 'nosniff')
       res.setHeader('Access-Control-Allow-Origin', '*')
