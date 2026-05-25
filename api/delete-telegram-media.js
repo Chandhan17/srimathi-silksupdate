@@ -29,6 +29,11 @@ export default async function handler(req, res) {
     return sendError(res, 400, 'Invalid request', parse.error.format())
   }
 
+  if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHANNEL_ID) {
+    console.error('Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHANNEL_ID in env for delete-telegram-media')
+    return sendError(res, 500, 'Server configuration error')
+  }
+
   return createTelegramMediaDeleteHandler({
     telegramToken: process.env.TELEGRAM_BOT_TOKEN,
     telegramChannelId: process.env.TELEGRAM_CHANNEL_ID,

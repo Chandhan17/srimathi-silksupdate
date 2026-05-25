@@ -23,6 +23,10 @@ export async function verifyAdmin(req, res) {
     const decoded = await adminAuth.verifyIdToken(token)
     const email = String(decoded.email || '').toLowerCase()
 
+    try {
+      console.log('verifyAdmin token decoded:', { uid: decoded.uid, email })
+    } catch (e) {}
+
     if (!email || !adminEmails.includes(email)) {
       jsonError(res, 401, 'Unauthorized: Admin access required')
       return null

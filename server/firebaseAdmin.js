@@ -32,10 +32,25 @@ function buildCredential() {
 
 function getAdminApp() {
   if (!getApps().length) {
-    initializeApp({ credential: buildCredential() })
+    const credentialSource = process.env.FIREBASE_SERVICE_ACCOUNT_JSON
+      ? 'SERVICE_ACCOUNT_JSON'
+      : process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY
+      ? 'CLIENT_EMAIL_KEY'
+      : 'APPLICATION_DEFAULT'
+
+    try {
+      initializeApp({ credential: buildCredential() })
+      console.log('Initialized Firebase Admin with credential source:', credentialSource)
+    } catch (e) {
+      console.error('Failed to initialize Firebase Admin:', e?.message || e)
+      throw e
+    }
   }
   return getApps()[0]
 }
 
 export const adminAuth = getAuth(getAdminApp())
 export const adminEmails = parseAdminEmails()
+try {
+  console.log('Admin emails for server verification:', adminEmails)
+} catch (e) {}

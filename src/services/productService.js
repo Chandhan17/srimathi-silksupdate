@@ -11,6 +11,7 @@ import {
   updateDoc,
 } from 'firebase/firestore'
 import { db } from './firebase'
+import { auth } from './firebase'
 import { normalizeImages } from '../utils/imageHelpers'
 import { deleteTelegramMedia } from './telegramMediaService'
 
@@ -95,6 +96,19 @@ export async function editProduct(productId, payload) {
 
 export async function removeProduct(productId) {
   const productRef = doc(db, 'products', productId)
+
+  // TEMPORARY debug logging to help diagnose production auth issues.
+  try {
+    console.log('removeProduct invoked', { productId })
+    console.log('Auth currentUser UID:', auth.currentUser?.uid || null)
+    console.log('Auth currentUser EMAIL:', auth.currentUser?.email || null)
+  } catch (e) {
+    console.error('Auth debug log failed', e?.message || e)
+  }
+
+  if (!auth.currentUser) {
+    throw new Error('Not authenticated. Ensure you are logged in before deleting products.')
+  }
 
   const snapshot = await getDoc(productRef)
   if (!snapshot.exists()) {

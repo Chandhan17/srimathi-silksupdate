@@ -294,10 +294,10 @@ async function getTelegramFileMeta({ telegramToken, fileId }) {
 
   const filePath = telegramResponse.data.result.file_path
 
-  if (isDevelopmentEnv()) {
-    console.log('Telegram fetch response status:', telegramResponse.status)
-    console.log('Resolved filePath:', filePath)
-  }
+  // Log response status and filePath (production-safe, no token)
+  try {
+    console.log('getTelegramFileMeta', { status: telegramResponse.status, filePath })
+  } catch (e) {}
 
   return {
     file_path: filePath,
@@ -323,9 +323,14 @@ async function fetchTelegramFileStream({ telegramToken, decodedFileId }) {
     console.log('Telegram download URL resolved (redacted)')
   }
 
+  // Request the file stream from Telegram (don't log the full URL as it contains the bot token)
   const imageResponse = await axios.get(telegramFileUrl, {
     responseType: 'stream',
   })
+
+  try {
+    console.log('fetchTelegramFileStream', { filePath, status: imageResponse.status })
+  } catch (e) {}
 
   return {
     imageResponse,
@@ -417,6 +422,7 @@ export function createTelegramImageProxyHandler({ telegramToken }) {
     }
 
     if (!telegramToken) {
+      console.error('Missing TELEGRAM_BOT_TOKEN in environment for image proxy')
       return sendError(res, 500, 'Telegram credentials are missing.')
     }
 
@@ -442,6 +448,13 @@ export function createTelegramImageProxyHandler({ telegramToken }) {
       if (isDevelopmentEnv()) {
         console.log('Resolved proxy filePath:', filePath)
         console.log('Streaming image now...')
+      }
+
+      // Production-safe logging for proxy action (no token printed)
+      try {
+        console.log('Proxying Telegram file', { filePath, referenceType: reference.type, proxiedStatus: imageResponse.status })
+      } catch (e) {
+        // ignore
       }
 
       const contentType =

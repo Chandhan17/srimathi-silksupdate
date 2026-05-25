@@ -13,6 +13,11 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const unsubscribe = subscribeToAuth((nextUser) => {
       setUser(nextUser)
+      try {
+        console.log('Auth state changed - UID:', nextUser?.uid || null, 'EMAIL:', nextUser?.email || null)
+      } catch (e) {
+        // ignore logging failures
+      }
       setAuthLoading(false)
     })
 

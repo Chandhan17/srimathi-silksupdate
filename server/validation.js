@@ -16,5 +16,5 @@ export const deleteTelegramSchema = z.object({
 export const razorpayOrderSchema = z.object({
   amount: z.number().int().positive().max(50000000),
   currency: z.string().optional().default('INR'),
-  receipt: z.string().optional().max(100),
+  receipt: z.string().max(100).optional(),
 })
