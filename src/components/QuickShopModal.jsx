@@ -51,7 +51,7 @@ export default function QuickShopModal({ product, isOpen, onClose }) {
 
   const whatsappMessage = useMemo(() => {
     if (!product) return ''
-    const imageUrl = getPrimaryImageUrl(product.images, 'Not available')
+    const productUrl = `${window.location.origin}/products/${product.id}`
     const { name, price, category, fabric } = product
     const {
       name: customerName,
@@ -63,7 +63,7 @@ export default function QuickShopModal({ product, isOpen, onClose }) {
       state,
     } = customer
 
-    return (paymentStatusLabel) => `${imageUrl}
+    return (paymentStatusLabel) => `View product: ${productUrl}
 
 Hi, I want to order:
 
