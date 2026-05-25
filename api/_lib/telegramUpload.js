@@ -110,6 +110,16 @@ function getMimeTypeFromPath(path = '') {
   return 'image/jpeg'
 }
 
+function getFileNameFromPath(path = '', fallbackName = 'image.jpg') {
+  const rawName = String(path || '')
+    .split('/')
+    .filter(Boolean)
+    .pop()
+
+  const sanitized = String(rawName || fallbackName).replace(/["]+/g, '').trim()
+  return sanitized || fallbackName
+}
+
 function runMiddleware(req, res, middleware) {
   return new Promise((resolve, reject) => {
     middleware(req, res, (error) => {
@@ -484,6 +494,7 @@ export function createTelegramImageProxyHandler({ telegramToken }) {
       res.statusCode = 200
       res.removeHeader('Content-Disposition')
       res.setHeader('Content-Type', safeContentType || 'image/jpeg')
+      res.setHeader('Content-Disposition', `inline; filename="${getFileNameFromPath(filePath, 'image.jpg')}"`)
       res.setHeader('Cache-Control', 'public, max-age=31536000, immutable')
       res.setHeader('X-Content-Type-Options', 'nosniff')
       res.setHeader('Access-Control-Allow-Origin', '*')
