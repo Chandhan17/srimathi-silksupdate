@@ -2,7 +2,7 @@ export const clientConfig = {
   brandName: 'Srimathi Silks',
   tagline: 'Handpicking sarees to make you feel Beautiful!',
   phone: '916300780235',
-  whatsapp: '917842091664',
+  whatsapp: '9133437430',
   email: '',
   address: 'Shop No: 183,184 (SVC Market), Proddatur, Andhra Pradesh - 516360',
   instagram: 'https://instagram.com/srimathisilks7',
