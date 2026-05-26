@@ -1,11 +1,11 @@
 import { motion as Motion } from 'framer-motion'
 
-export default function SectionReveal({ children, delay = 0 }) {
+export default function SectionReveal({ children, delay = 0, amount = 0.1 }) {
   return (
     <Motion.div
       initial={{ opacity: 0, y: 28 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.25 }}
+      viewport={{ once: true, amount }}
       transition={{ duration: 0.6, delay, ease: 'easeOut' }}
     >
       {children}

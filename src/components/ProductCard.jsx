@@ -56,12 +56,12 @@ export default function ProductCard({ product, onQuickShop }) {
       </div>
 
       <div className="space-y-3 p-5">
-        <p className="text-xs uppercase tracking-[0.22em] text-brand-maroon/70">{product.category}</p>
-        <h3 className="font-display text-2xl text-brand-maroon">{product.name}</h3>
-        <p className="text-sm text-brand-maroon/70">Fabric: {product.fabric}</p>
+        <p className="break-words text-xs uppercase tracking-[0.22em] text-brand-maroon/70">{product.category}</p>
+        <h3 className="break-words font-display text-2xl leading-tight text-brand-maroon">{product.name}</h3>
+        <p className="break-words text-sm text-brand-maroon/70">Fabric: {product.fabric}</p>
         <p className="text-lg font-semibold text-brand-gold">{formatINR(product.price)}</p>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row">
           <Link
             to={`/products/${product.id}`}
             className="btn-outline flex-1 text-center"

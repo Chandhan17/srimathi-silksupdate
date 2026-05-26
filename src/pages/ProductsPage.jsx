@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import FiltersBar from '../components/FiltersBar'
 import LoadingSkeleton from '../components/LoadingSkeleton'
@@ -21,6 +21,7 @@ export default function ProductsPage() {
   const categoryFromParams = searchParams.get('category') || ''
   const [filters, setFilters] = useState(initialFilters)
   const [selectedProduct, setSelectedProduct] = useState(null)
+  const [visibleCount, setVisibleCount] = useState(6)
   const { products, loading, error } = useProducts()
 
   const sizeOptions = useMemo(
@@ -46,6 +47,12 @@ export default function ProductsPage() {
     })
   }, [products, filters, categoryFromParams])
 
+  const visibleProducts = useMemo(
+    () => filteredProducts.slice(0, visibleCount),
+    [filteredProducts, visibleCount]
+  )
+  const hasMoreFilteredProducts = visibleCount < filteredProducts.length
+
   const updateFilter = (field, value) => {
     if (field === 'category') {
       const nextParams = new URLSearchParams(searchParams)
@@ -59,6 +66,12 @@ export default function ProductsPage() {
     }
     setFilters((prev) => ({ ...prev, [field]: value }))
   }
+
+  // Reset pagination whenever filters/category alter the result set.
+  useEffect(() => {
+    setVisibleCount(6)
+  }, [filters, categoryFromParams, products.length])
+
   return (
     <SectionReveal>
       <FiltersBar
@@ -84,7 +97,20 @@ export default function ProductsPage() {
           {error}
         </div>
       ) : (
-        <ProductGrid products={filteredProducts} onQuickShop={setSelectedProduct} />
+        <>
+          <ProductGrid products={visibleProducts} onQuickShop={setSelectedProduct} />
+          {hasMoreFilteredProducts && (
+            <div className="pt-6 text-center">
+              <button
+                type="button"
+                onClick={() => setVisibleCount((prev) => prev + 6)}
+                className="btn-gold px-7 py-3 text-sm uppercase tracking-[0.2em]"
+              >
+                View More
+              </button>
+            </div>
+          )}
+        </>
       )}
       <QuickShopModal
         product={selectedProduct}

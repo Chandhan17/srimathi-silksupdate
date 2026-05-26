@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import HeroBanner from '../components/HeroBanner'
 import LoadingSkeleton from '../components/LoadingSkeleton'
@@ -12,9 +12,19 @@ import { getPrimaryImageUrl } from '../utils/imageHelpers'
 export default function HomePage() {
   const { products, loading, error } = useProducts()
   const [selectedProduct, setSelectedProduct] = useState(null)
+  const [visibleCount, setVisibleCount] = useState(6)
 
-  const featuredProducts = useMemo(() => products.slice(0, 6), [products])
+  const featuredProducts = useMemo(() => products.slice(0, visibleCount), [products, visibleCount])
   const premiumCollection = useMemo(() => products.slice(0, 3), [products])
+  const hasMoreFeaturedProducts = visibleCount < products.length
+
+  useEffect(() => {
+    setVisibleCount(6)
+  }, [products.length])
+
+  const handleViewMore = () => {
+    setVisibleCount((prev) => prev + 6)
+  }
 
   return (
     <div className="space-y-14">
@@ -84,7 +94,7 @@ export default function HomePage() {
         </section>
       </SectionReveal>
 
-      <SectionReveal delay={0.12}>
+      <SectionReveal delay={0.12} amount={0.02}>
         <section className="space-y-5">
           <div>
             <p className="section-kicker">Featured Sarees</p>
@@ -94,7 +104,20 @@ export default function HomePage() {
           {loading ? (
             <LoadingSkeleton />
           ) : (
-            <ProductGrid products={featuredProducts} onQuickShop={setSelectedProduct} />
+            <>
+              <ProductGrid products={featuredProducts} onQuickShop={setSelectedProduct} />
+              {hasMoreFeaturedProducts && (
+                <div className="pt-4 text-center">
+                  <button
+                    type="button"
+                    onClick={handleViewMore}
+                    className="btn-gold px-7 py-3 text-sm uppercase tracking-[0.2em]"
+                  >
+                    View More
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </section>
       </SectionReveal>
